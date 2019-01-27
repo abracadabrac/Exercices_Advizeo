@@ -2,6 +2,7 @@ import pandas as pd
 import random
 import numpy as np
 from variables import Variables
+import keras
 
 V = Variables()
 
@@ -10,11 +11,12 @@ class Data:
     """
     class Data permits to manage the data. I particular it provides the generator.
     """
-    def __init__(self, csv_path, days_list, expand_dims=True):
+    def __init__(self, csv_path, days_list, expand_dims=True, label_categorical=False):
         self.df = pd.read_csv(csv_path, index_col=0, parse_dates=[0])
         self.days_list = days_list
 
         self.expand_dims = expand_dims
+        self.label_categorical = label_categorical
 
     def generator(self, batch_size):
         """
@@ -56,6 +58,9 @@ class Data:
                     if self.expand_dims:
                         batch_values = np.expand_dims(batch_values, axis=-1)
                         batch_labels = np.expand_dims(batch_labels, axis=-1)
+
+                    if self.label_categorical:
+                        batch_labels = keras.utils.to_categorical(batch_labels)
 
                     yield batch_values, batch_labels #, batch_dayOff
 
